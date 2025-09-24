@@ -4,7 +4,18 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "anticaptchaofficial>=1.0.67",
+    "httpx>=0.28.1",
+    "pydantic>=2.11.9",
+    "pydantic-settings>=2.11.0",
+]
 
 [tool.uv]
 cache-dir=".cache"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.18.2",
+    "ruff>=0.13.1",
+]
