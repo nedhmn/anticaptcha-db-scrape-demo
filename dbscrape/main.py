@@ -1,12 +1,14 @@
 import json
 import os
 from typing import Any
-from urllib.parse import parse_qs, urlparse
 
 import httpx
-from anticaptchaofficial.recaptchav3proxyless import recaptchaV3Proxyless  # type: ignore
+from anticaptchaofficial.recaptchav3proxyless import (  # type: ignore
+    recaptchaV3Proxyless,
+)
 
 from dbscrape.settings import settings
+from dbscrape.utils import get_replay_id, validate_json_response
 
 URLS = [
     "https://duelingbook.com/replay?id=72221622",
@@ -23,24 +25,6 @@ def main() -> None:
         replay_id = get_replay_id(url)
         replay_json = scrape_url(url, replay_id)
         save_replay(replay_json, replay_id)
-
-
-def get_replay_id(url: str) -> str:
-    parsed_url = urlparse(url)
-    query_params = parse_qs(parsed_url.query)
-
-    replay_id = query_params.get("id")
-
-    if replay_id is None:
-        raise ValueError(f"No replay id found in URL: {url}")
-
-    return replay_id[0]
-
-
-def validate_json_response(response_data: Any) -> dict[str, Any]:
-    if not isinstance(response_data, dict):
-        raise ValueError("Response is not a dictionary")
-    return response_data
 
 
 def save_replay(replay_json: dict[str, Any], replay_id: str) -> None:
