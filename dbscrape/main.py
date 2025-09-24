@@ -4,7 +4,7 @@ from typing import Any
 from urllib.parse import parse_qs, urlparse
 
 import httpx
-from anticaptchaofficial.recaptchav3proxyless import recaptchaV3Proxyless
+from anticaptchaofficial.recaptchav3proxyless import recaptchaV3Proxyless  # type: ignore
 
 from dbscrape.settings import settings
 
@@ -18,7 +18,7 @@ URLS = [
 ]
 
 
-def main():
+def main() -> None:
     for url in URLS:
         replay_id = get_replay_id(url)
         replay_json = scrape_url(url, replay_id)
@@ -28,7 +28,19 @@ def main():
 def get_replay_id(url: str) -> str:
     parsed_url = urlparse(url)
     query_params = parse_qs(parsed_url.query)
-    return query_params.get("id")[0]
+
+    replay_id = query_params.get("id")
+
+    if replay_id is None:
+        raise ValueError(f"No replay id found in URL: {url}")
+
+    return replay_id[0]
+
+
+def validate_json_response(response_data: Any) -> dict[str, Any]:
+    if not isinstance(response_data, dict):
+        raise ValueError("Response is not a dictionary")
+    return response_data
 
 
 def save_replay(replay_json: dict[str, Any], replay_id: str) -> None:
@@ -47,7 +59,7 @@ def scrape_url(url: str, replay_id: str) -> dict[str, Any]:
         form_data = {"token": g_response, "recaptcha_version": 3, "master": False}
         response = client.post(url=data_url, data=form_data)
 
-        return response.json()
+        return validate_json_response(response.json())
 
 
 def solve_recaptcha_v3(url: str) -> str:
@@ -60,7 +72,7 @@ def solve_recaptcha_v3(url: str) -> str:
 
     g_response: str = solver.solve_and_return_solution()
 
-    if g_response != 0:
+    if g_response != "0":
         return g_response
 
     raise ValueError("Error with the CAPTCHA")

@@ -11,11 +11,18 @@ dependencies = [
     "pydantic-settings>=2.11.0",
 ]
 
-[tool.uv]
-cache-dir=".cache"
-
 [dependency-groups]
 dev = [
     "mypy>=1.18.2",
     "ruff>=0.13.1",
 ]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["dbscrape/**/*.py"]
+exclude = ['(?x)(^|/)ignore_.*\.py$']
+plugins = ["pydantic.mypy"]
+strict = true
+
+[tool.uv]
+cache-dir=".cache"
